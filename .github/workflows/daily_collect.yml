@@ -50,7 +50,7 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
         working-directory: dataset
-        run: python ../scripts/collect_daily_test.py
+        run: python ../scripts/collect_daily.py
 
       # Step 3: Check if rotation needed
       - name: Check for rotation flag
@@ -106,8 +106,8 @@ jobs:
           dvc push
 
           # --- ROLLING WINDOW CLEANUP ---
-          # Config: Keep only the 2 most recent batches (TEST MODE!)
-          MAX_BATCHES=2
+          # Config: Keep only the 350 most recent batches (PRODUCTION)
+          MAX_BATCHES=350
 
           # Count existing batch .dvc files
           BATCH_COUNT=$(ls batches/batch_*.dvc 2>/dev/null | wc -l)
