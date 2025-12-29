@@ -48,14 +48,15 @@ def main():
     # 1. Fetch minimal videos (Low Quota Usage)
     print("🧪 RUNNING IN TEST MODE")
     print("Fetching ~1-2 videos...")
-    
+
     videos = client.fetch_batch(
-        days_ago=2,                  # Only recent (likely to exist)
+        days_ago=7,                  # Search past week (more likely to find videos)
         videos_per_category=2,       # Try to get 2 videos
         categories=TEST_CATEGORY,    # Only 1 category (Gaming)
         region=TEST_REGION,          # Only 1 region (US)
-        min_subscribers=1000,        # Lower barrier for test
-        min_views=100,
+        min_subscribers=100,         # Very low barrier for test
+        min_views=10,                # Very low views requirement
+        min_duration_seconds=30,     # Lower duration requirement
         video_duration="medium",
     )
 
