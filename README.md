@@ -1,42 +1,56 @@
 # YouTube Thumbnails MLOps
 
-Automated data collection pipeline with batch rotation.
+Automated daily collection of YouTube thumbnails with DVC versioning and W&B logging.
 
-## How It Works
+## What This Does
 
-Daily at 8 AM UTC:
-1. Pull `current/` folder (max 500 images)
-2. Fetch and add new thumbnails (varies by filtering/availability)
-3. If < 500: push and done
-4. If >= 500: rotate `current/` → `batches/batch_XXX/`, create version tag
+Daily at 8 AM UTC (or manual trigger):
+1. Pull current data from R2
+2. Fetch ~50 YouTube videos + thumbnails
+3. Add to `current/` folder
+4. When 500 samples reached → rotate to `batches/batch_XXX/` and version
+5. Delete oldest batch when 350 batches reached (rolling window)
+6. Log all data to W&B (compressed for visualization)
 
 ## Structure
 
 ```
 youtube-thumbnails-monorepo/
-├── libs/youtube_collector/    # Collection library
-├── scripts/collect_daily.py   # Daily collection + rotation
+├── libs/youtube_collector/          # YouTube API client
+├── scripts/
+│   ├── collect_daily.py             # Production (500/batch, all categories)
+│   ├── collect_daily_test.py        # Test (3/batch, Gaming only)
+│   └── reset_dataset.sh             # Reset R2 + W&B + git
 └── .github/workflows/
-    ├── ci.yml                 # PR tests
-    └── daily_collect.yml      # Daily collection
+    └── daily_collect.yml            # GitHub Actions workflow
 ```
 
 ## Setup
 
-1. Install library:
-```bash
-pip install -e libs/youtube_collector
-```
+Add GitHub Secrets:
+- `YOUTUBE_API_KEY` - Google Cloud Console
+- `WANDB_API_KEY` - wandb.ai/settings
+- `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` - Cloudflare R2
+- `DATASET_REPO_TOKEN` - GitHub PAT
 
-2. Configure GitHub secrets:
-- `YOUTUBE_API_KEY`
-- `DATASET_REPO_TOKEN`
-- `R2_ENDPOINT`
-- `R2_ACCESS_KEY_ID`
-- `R2_SECRET_ACCESS_KEY`
+## Data Schema
 
-3. Push and let it run daily
+24 columns per sample:
+- Visual: thumbnail (1280x720 in R2, 400x400 in W&B)
+- IDs: video_id, channel_id
+- Metadata: title, category, views, likes, comments, subscribers, tags, duration, etc.
+- Features: viral_ratio, title_length, is_clickbait
+- Versioning: batch_version
+
+## Storage
+
+- **R2**: Full-res images + CSV (10GB free → ~175K images)
+- **W&B**: Compressed images + metadata (5GB free, auto-pruned to 350 runs)
+
+## Costs
+
+**$0/month** (GitHub Actions + R2 + W&B + YouTube API all free tier)
 
 ## Related
 
-- [youtube-thumbnails-dataset](https://github.com/YOUR_ORG/youtube-thumbnails-dataset) - DVC-tracked data storage
+- [youtube-thumbnails-dataset](https://github.com/YOUR_ORG/youtube-thumbnails-dataset) - DVC data repo
