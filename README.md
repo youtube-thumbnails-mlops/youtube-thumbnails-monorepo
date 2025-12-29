@@ -1,4 +1,4 @@
-# YouTube Thumbnails MLOps
+# YouTube Thumbnails Collection Pipeline
 
 Automated daily collection of YouTube thumbnails with DVC versioning and W&B logging.
 
@@ -22,7 +22,7 @@ Daily at 8 AM UTC (or manual trigger):
 ## Structure
 
 ```
-youtube-thumbnails-monorepo/
+youtube-thumbnails-collection/
 ├── libs/youtube_collector/          # YouTube API client
 ├── scripts/
 │   ├── collect_daily.py             # Production (500/batch, all categories)
@@ -46,8 +46,19 @@ Add GitHub Secrets:
 - Visual: thumbnail (1280x720 in R2, 400x400 in W&B)
 - IDs: video_id, channel_id
 - Metadata: title, category, views, likes, comments, subscribers, tags, duration, etc.
-- Features: viral_ratio, title_length, is_clickbait
+- Features: viral_ratio
 - Versioning: batch_version
+
+## Viral Score Metric
+The `viral_ratio` is calculated using a **Log-Difference Score** to robustly handle channel size differences:
+
+**Formula:**
+`viral_ratio = log10(views) - log10(channel_avg_views)`
+
+**Interpretation:**
+- `0.0`: Performed eactly as expected (Average)
+- `> 0.0`: Outperformed channel average (**Viral**)
+- `< 0.0`: Underperformed channel average (**Flop**)
 
 ## Storage & Retention
 
