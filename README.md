@@ -42,10 +42,22 @@ Add GitHub Secrets:
 - Features: viral_ratio, title_length, is_clickbait
 - Versioning: batch_version
 
-## Storage
+## Storage & Retention
 
-- **R2**: Full-res images + CSV (10GB free → ~175K images)
-- **W&B**: Compressed images + metadata (5GB free, auto-pruned to 350 runs)
+**R2 (10GB free tier):**
+- Stores full-res images (1280x720) + CSV
+- Rolling window: 350 batches × 500 samples = 175,000 images (~10GB)
+- Auto-deletes oldest batch when limit reached via `dvc gc`
+
+**W&B (5GB free tier):**
+- Stores compressed images (400x400) + metadata
+- Auto-prunes to 350 runs (matches R2 window)
+- Each run ~14MB → 350 runs = ~4.9GB (stays under limit)
+
+**Data Retention:**
+- Collection scripts automatically prune old runs/batches
+- No manual cleanup needed
+- Stays within free tiers indefinitely
 
 ## Costs
 
