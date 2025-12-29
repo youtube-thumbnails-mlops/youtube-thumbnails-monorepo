@@ -53,7 +53,8 @@ Add GitHub Secrets:
 The `viral_ratio` is calculated using a **Log-Difference Score** to robustly handle channel size differences:
 
 **Formula:**
-`viral_ratio = log10(views) - log10(channel_avg_views)`
+1.  `baseline = channel_total_views / max(channel_video_count, 1)`
+2.  `viral_ratio = log10(views + 1) - log10(baseline + 1)`
 
 **Interpretation:**
 - `0.0`: Performed eactly as expected (Average)
