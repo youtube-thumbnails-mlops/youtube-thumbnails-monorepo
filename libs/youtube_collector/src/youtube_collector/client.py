@@ -29,9 +29,11 @@ class YouTubeClient:
 
     # Default categories to search (ID: Name)
     DEFAULT_CATEGORIES = {
-        '10': 'Music', '17': 'Sports', '20': 'Gaming', '22': 'People & Blogs',
-        '23': 'Comedy', '24': 'Entertainment', '25': 'News & Politics',
-        '26': 'Howto & Style', '27': 'Education', '28': 'Science & Technology',
+        '1': 'Film & Animation', '2': 'Autos & Vehicles',
+        '10': 'Music', '15': 'Pets & Animals', '17': 'Sports', '19': 'Travel & Events',
+        '20': 'Gaming', '22': 'People & Blogs', '23': 'Comedy', '24': 'Entertainment',
+        '25': 'News & Politics', '26': 'Howto & Style', '27': 'Education',
+        '28': 'Science & Technology', '29': 'Nonprofits & Activism',
     }
 
     # Region presets
@@ -56,6 +58,7 @@ class YouTubeClient:
         region: str = "US",
         min_subscribers: int = 1000,
         min_views: int = 0,
+        min_view_ratio: float = 0.0,
         min_duration_seconds: int = 60,
         video_duration: str = "medium",
     ) -> List[Dict[str, Any]]:
@@ -103,7 +106,10 @@ class YouTubeClient:
         for v in all_videos:
             if v['video_id'] not in seen:
                 # Late Filter: Check subs/views here
-                if v['channel_subscribers'] >= min_subscribers and v['views'] >= min_views:
+                # Quality Control: Ensure video meets both absolute and relative view thresholds
+                required_views = max(min_views, int(v['channel_subscribers'] * min_view_ratio))
+
+                if v['channel_subscribers'] >= min_subscribers and v['views'] >= required_views:
                     seen.add(v['video_id'])
                     unique_videos.append(v)
 

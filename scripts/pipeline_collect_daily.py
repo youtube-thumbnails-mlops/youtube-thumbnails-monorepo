@@ -31,19 +31,6 @@ def get_next_batch_number(batches_dir):
             return max(versions) + 1
     return 1
 
-def calculate_metrics(video):
-    # Calculate baseline (Average views per video for this channel)
-    total_views = float(video.get('channel_total_views', 0))
-    video_count = max(float(video.get('channel_video_count', 1)), 1.0)
-    avg_views = total_views / video_count
-    
-    # Calculate Log-Difference
-    # Log10(Video Views) - Log10(Average Channel Views)
-    # > 0 means video outperformed channel average
-    log_views = math.log10(float(video.get('views', 0)) + 1)
-    log_baseline = math.log10(avg_views + 1)
-    
-    return log_views - log_baseline
 
 def prune_old_wandb_runs(project_name, max_runs):
     """Deletes oldest runs to keep W&B storage inside the 5GB limit."""
@@ -80,6 +67,7 @@ def main():
         region="US_EU",
         min_subscribers=10000,
         min_views=100,
+        min_view_ratio=0.0001,  # 0.01% of subs (e.g. 27M subs -> 2700 views)
         video_duration="medium",
     )
     if not videos:
@@ -90,9 +78,8 @@ def main():
     client.download_thumbnails_bulk(videos, output_dir=str(current_dir))
 
     for video in videos:
-        ratio = calculate_metrics(video)
-        video['viral_ratio'] = ratio
-        # batch_version is added during W&B log step usually, 
+        # User asked for SAME columns as CSV.
+        # batch_version is usually W&B only, but we add it to CSV for consistency.
         # but if we want it in CSV, we should add it here.
         # However, the original code had it only in W&B.
         # User asked for SAME columns. W&B has 'batch_version'.
@@ -120,7 +107,7 @@ def main():
             "channel_id", "channel_subscribers", "channel_total_views", "channel_video_count",
             "tags", "description_len", "duration_seconds", "definition", "language",
             "published_at", "captured_at", "video_url", "thumbnail_url",
-            "viral_ratio", "batch_version"
+            "batch_version"
         ])
 
         for video in videos:
@@ -145,9 +132,8 @@ def main():
                         video['channel_total_views'], video['channel_video_count'],
                         video['tags'], video['description_len'], video['duration_seconds'],
                         video['definition'], video['language'],
-                        video['published_at'], video['captured_at'],
                         video['video_url'], video['thumbnail_url'],
-                        video['viral_ratio'], target_batch_name
+                        target_batch_name
                     )
                 # ----------------------
 
