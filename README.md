@@ -26,7 +26,6 @@ youtube-thumbnails-collection/
 ├── libs/youtube_collector/          # YouTube API client
 ├── scripts/
 │   ├── collect_daily.py             # Production (500/batch, all categories)
-│   ├── collect_daily_test.py        # Test (3/batch, Gaming only)
 │   └── reset_dataset.sh             # Reset R2 + W&B + git
 └── .github/workflows/
     └── daily_collect.yml            # GitHub Actions workflow
