@@ -46,20 +46,14 @@ Add GitHub Secrets:
 - Visual: thumbnail (1280x720 in R2, 400x400 in W&B)
 - IDs: video_id, channel_id
 - Metadata: title, category, views, likes, comments, subscribers, tags, duration, etc.
-- Features: viral_ratio
+- Features: category_name
 - Versioning: batch_version
 
-## Viral Score Metric
-The `viral_ratio` is calculated using a **Log-Difference Score** to robustly handle channel size differences:
-
-**Formula:**
-1.  `baseline = channel_total_views / max(channel_video_count, 1)`
-2.  `viral_ratio = log10(views + 1) - log10(baseline + 1)`
-
-**Interpretation:**
-- `0.0`: Performed eactly as expected (Average)
-- `> 0.0`: Outperformed channel average (**Viral**)
-- `< 0.0`: Underperformed channel average (**Flop**)
+## Active Filters
+1.  **Time**: Last 7 days
+2.  **Size**: >10k Subscribers
+3.  **Quality**: Views > 0.01% of Subs (Removes spam/glitches)
+4.  **Categories**: 15 Major YouTube Categories
 
 ## Storage & Retention
 
