@@ -77,4 +77,5 @@ Add GitHub Secrets:
 
 ## Related
 
+- [Project Website (Live)](https://youtube-thumbnails-mlops.github.io/youtube-thumbnails-site/) - Premium Showcase
 - [youtube-thumbnails-dataset](https://github.com/youtube-thumbnails-mlops/youtube-thumbnails-dataset) - DVC data repo
