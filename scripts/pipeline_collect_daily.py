@@ -132,6 +132,7 @@ def main():
                         video['channel_total_views'], video['channel_video_count'],
                         video['tags'], video['description_len'], video['duration_seconds'],
                         video['definition'], video['language'],
+                        video['published_at'], video['captured_at'],
                         video['video_url'], video['thumbnail_url'],
                         target_batch_name
                     )
