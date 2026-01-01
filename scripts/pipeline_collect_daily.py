@@ -75,9 +75,17 @@ def main():
 
     # 2. Fetch & Download (HQ for R2)
     print("Fetching videos...")
+    
+    # Parse categories from env var
+    categories_env = os.getenv("COLLECT_CATEGORIES", "")
+    categories = [c.strip() for c in categories_env.split(",")] if categories_env else None
+    if categories:
+        print(f"🎯 Filtering by categories: {categories}")
+
     videos = client.fetch_batch(
         days_ago=7,
         videos_per_category=videos_per_cat,
+        categories=categories,
         region="US_EU",
         min_subscribers=10000,
         min_views=100,
