@@ -59,6 +59,9 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
           COLLECT_FOR_TEST_SET: ${{ vars.COLLECT_FOR_TEST_SET }}
+          # Optimized for speed + quota safety. 
+          # 65 videos/cat * 5 regions = ~975 videos daily.
+          COLLECT_VIDEOS_PER_CATEGORY: "65"
           # All categories by default. Remove IDs to filter.
           # 1:Film, 2:Autos, 10:Music, 15:Pets, 17:Sports, 19:Travel, 20:Gaming
           # 22:People, 23:Comedy, 24:Entertainment, 25:News, 26:Style, 27:Edu

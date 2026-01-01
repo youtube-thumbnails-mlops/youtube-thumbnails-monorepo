@@ -65,11 +65,12 @@ class YouTubeClient:
         """
         Fetch a batch of videos across random categories and regions.
         """
-        # 1. Resolve Regions
-        if region in self.REGION_PRESETS:
-            region_codes = self.REGION_PRESETS[region]
+        if isinstance(region, list):
+             region_codes = region
+        elif region in self.REGION_PRESETS:
+             region_codes = self.REGION_PRESETS[region]
         else:
-            region_codes = [region]
+             region_codes = [region]
 
         # CRITICAL: Shuffle regions to prevent bias if quota runs out
         random.shuffle(region_codes)

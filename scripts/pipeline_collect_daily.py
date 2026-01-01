@@ -9,11 +9,12 @@ import sys
 import wandb
 from pathlib import Path
 from PIL import Image
+import random
 from youtube_collector import YouTubeClient
 
 # CONSTANTS
-BATCH_LIMIT = 500
-MAX_WANDB_RUNS = 350  # Match R2 window
+BATCH_LIMIT = 1000
+MAX_WANDB_RUNS = 150  # Match R2 window
 
 def count_samples(metadata_file):
     if not metadata_file.exists():
@@ -58,8 +59,9 @@ def main():
         videos_per_cat = 50 # Max possible per page. 200 images -> 4 days.
     else:
         output_folder_name = "current"
-        videos_per_cat = 5 # Default
-    
+        # OPTIMIZED DEFAULT: 65 videos/cat * 5 regions = ~975 videos (fills 1000 batch in ~1 day)
+        videos_per_cat = int(os.getenv("COLLECT_VIDEOS_PER_CATEGORY", "65"))
+
     client = YouTubeClient()
     current_dir = Path(output_folder_name)
     batches_dir = Path("batches")
@@ -82,11 +84,17 @@ def main():
     if categories:
         print(f"🎯 Filtering by categories: {categories}")
 
+    # OPTIMIZATION: Select 5 random regions to stay under 10k quota
+    # 5 regions * 15 cats = 75 searches (7500 quota) -> LEAVES 2500 for details
+    all_regions = client.REGION_PRESETS["US_EU"]
+    selected_regions = random.sample(all_regions, 5)
+    print(f"🌍 Selected Random Regions: {selected_regions}")
+
     videos = client.fetch_batch(
         days_ago=7,
         videos_per_category=videos_per_cat,
         categories=categories,
-        region="US_EU",
+        region=selected_regions,
         min_subscribers=10000,
         min_views=100,
         min_view_ratio=0.0001,  # 0.01% of subs (e.g. 27M subs -> 2700 views)

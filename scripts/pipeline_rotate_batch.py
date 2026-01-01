@@ -10,7 +10,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-MAX_BATCHES = 350
+MAX_BATCHES = 150
 
 def run_command(cmd, cwd=None):
     """Runs a shell command and raises error if it fails."""
